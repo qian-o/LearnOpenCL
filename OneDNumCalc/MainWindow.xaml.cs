@@ -22,26 +22,38 @@ public partial class MainWindow : Window
     private unsafe void Window_Loaded(object sender, RoutedEventArgs e)
     {
         string source = @"
-            kernel void add(global const int* a, global const int* b, global int* c, float amplify)
+            kernel void add(global const int* a, global const int* b, global int* c)
             {
                 int i = get_global_id(0);
-                c[i] = (a[i] + b[i]) * amplify;
+                c[i] = a[i] + b[i];
+            }
+
+            kernel void mul(global const int* a, global const int* b, global int* c)
+            {
+                int i = get_global_id(0);
+                c[i] = a[i] * b[i];
             }";
 
         Platform platform = cl.GetPlatforms().First();
 
         using Device device = platform.GetDevices(DeviceType.Gpu).First();
         using Program program = device.CreateProgram(source);
+
+        TestAdd(program);
+        TestMul(program);
+    }
+
+    private unsafe void TestAdd(Program program)
+    {
         using Kernel kernel = program.GetKernel("add");
 
-        nint memA = device.CreateBuffer<int>(1024, MemFlags.ReadOnly);
-        nint memB = device.CreateBuffer<int>(1024, MemFlags.ReadOnly);
-        nint memC = device.CreateBuffer<int>(1024, MemFlags.WriteOnly);
+        nint memA = program.Device.CreateBuffer<int>(1024, MemFlags.ReadOnly);
+        nint memB = program.Device.CreateBuffer<int>(1024, MemFlags.ReadOnly);
+        nint memC = program.Device.CreateBuffer<int>(1024, MemFlags.WriteOnly);
 
         kernel.SetArgument(0, memA);
         kernel.SetArgument(1, memB);
         kernel.SetArgument(2, memC);
-        kernel.SetArgument(3, 2.0f);
 
         int* a = stackalloc int[1024];
         int* b = stackalloc int[1024];
@@ -52,16 +64,58 @@ public partial class MainWindow : Window
             b[i] = i;
         }
 
-        device.WriteBuffer<int>(memA, 1024, a);
-        device.WriteBuffer<int>(memB, 1024, b);
+        program.Device.WriteBuffer<int>(memA, 1024, a);
+        program.Device.WriteBuffer<int>(memB, 1024, b);
 
         kernel.Run(1, 1024);
 
-        device.ReadBuffer<int>(memC, 1024, c);
+        program.Device.ReadBuffer<int>(memC, 1024, c);
 
         for (int i = 0; i < 1024; i++)
         {
-            Debug.WriteLine(c[i]);
+            Debug.WriteLine($"{a[i]} + {b[i]} = {c[i]}");
         }
+
+        program.Device.DeleteBuffer(memA);
+        program.Device.DeleteBuffer(memB);
+        program.Device.DeleteBuffer(memC);
+    }
+
+    private unsafe void TestMul(Program program)
+    {
+        using Kernel kernel = program.GetKernel("mul");
+
+        nint memA = program.Device.CreateBuffer<int>(1024, MemFlags.ReadOnly);
+        nint memB = program.Device.CreateBuffer<int>(1024, MemFlags.ReadOnly);
+        nint memC = program.Device.CreateBuffer<int>(1024, MemFlags.WriteOnly);
+
+        kernel.SetArgument(0, memA);
+        kernel.SetArgument(1, memB);
+        kernel.SetArgument(2, memC);
+
+        int* a = stackalloc int[1024];
+        int* b = stackalloc int[1024];
+        int* c = stackalloc int[1024];
+        for (int i = 0; i < 1024; i++)
+        {
+            a[i] = i;
+            b[i] = i;
+        }
+
+        program.Device.WriteBuffer<int>(memA, 1024, a);
+        program.Device.WriteBuffer<int>(memB, 1024, b);
+
+        kernel.Run(1, 1024);
+
+        program.Device.ReadBuffer<int>(memC, 1024, c);
+
+        for (int i = 0; i < 1024; i++)
+        {
+            Debug.WriteLine($"{a[i]} * {b[i]} = {c[i]}");
+        }
+
+        program.Device.DeleteBuffer(memA);
+        program.Device.DeleteBuffer(memB);
+        program.Device.DeleteBuffer(memC);
     }
 }

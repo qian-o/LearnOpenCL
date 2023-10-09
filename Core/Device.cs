@@ -88,6 +88,16 @@ public unsafe class Device : IDisposable
     }
 
     /// <summary>
+    /// 删除缓存
+    /// </summary>
+    /// <param name="buffer_id">缓存Id</param>
+    public void DeleteBuffer(nint buffer_id)
+    {
+        _cl.ReleaseMemObject(buffer_id);
+        _buffers.Remove(buffer_id);
+    }
+
+    /// <summary>
     /// 写入缓存
     /// </summary>
     /// <param name="buffer_id">缓存Id</param>
