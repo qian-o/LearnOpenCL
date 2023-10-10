@@ -6,9 +6,11 @@
         mc:Ignorable="d"
         Title="MainWindow"
         Height="450"
-        Width="800"
-        Loaded="Window_Loaded">
+        Width="800">
     <Grid>
-
+        <Button HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Content="Run"
+                Click="Button_Click" />
     </Grid>
 </Window>

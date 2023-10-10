@@ -1,4 +1,5 @@
-﻿using Silk.NET.OpenCL;
+﻿using Core.Helpers;
+using Silk.NET.OpenCL;
 
 namespace Core;
 
@@ -26,7 +27,7 @@ public unsafe class Kernel : IDisposable
     /// <param name="buffer_id">缓存Id</param>
     public void SetArgument(uint index, nint buffer_id)
     {
-        _cl.SetKernelArg(_id, index, (uint)sizeof(nint), &buffer_id);
+        _cl.SetKernelArg(_id, index, (uint)sizeof(nint), &buffer_id).StateCheck();
     }
 
     /// <summary>
@@ -37,7 +38,7 @@ public unsafe class Kernel : IDisposable
     /// <param name="value">值</param>
     public void SetArgument<T>(uint index, T value) where T : unmanaged
     {
-        _cl.SetKernelArg(_id, index, (uint)sizeof(T), value);
+        _cl.SetKernelArg(_id, index, (uint)sizeof(T), value).StateCheck();
     }
 
     /// <summary>
@@ -47,7 +48,7 @@ public unsafe class Kernel : IDisposable
     /// <param name="size">计算长度</param>
     public void Run(uint dim, uint size)
     {
-        _cl.EnqueueNdrangeKernel(Program.Device.CommandQueue, _id, dim, null, size, null, 0, null, null);
+        _cl.EnqueueNdrangeKernel(Program.Device.CommandQueue, _id, dim, null, size, null, 0, null, null).StateCheck();
     }
 
     public void Dispose()

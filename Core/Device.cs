@@ -1,4 +1,5 @@
-﻿using Silk.NET.OpenCL;
+﻿using Core.Helpers;
+using Silk.NET.OpenCL;
 
 namespace Core;
 
@@ -67,7 +68,7 @@ public unsafe class Device : IDisposable
 
         nint program_id = _cl.CreateProgramWithSource(_context, 1, new[] { source }, null, null);
 
-        _cl.BuildProgram(program_id, 0, null, string.Join(' ', options), null, null);
+        _cl.BuildProgram(program_id, 0, null, string.Join(' ', options), null, null).StateCheck();
 
         return new Program(_cl, program_id, this);
     }
@@ -93,7 +94,7 @@ public unsafe class Device : IDisposable
     /// <param name="buffer_id">缓存Id</param>
     public void DeleteBuffer(nint buffer_id)
     {
-        _cl.ReleaseMemObject(buffer_id);
+        _cl.ReleaseMemObject(buffer_id).StateCheck();
         _buffers.Remove(buffer_id);
     }
 
@@ -105,7 +106,7 @@ public unsafe class Device : IDisposable
     /// <param name="ptr">数据地址</param>
     public void WriteBuffer<T>(nint buffer_id, uint size, void* ptr) where T : unmanaged
     {
-        _cl.EnqueueWriteBuffer(_commandQueue, buffer_id, true, 0, (uint)(size * sizeof(T)), ptr, 0, null, null);
+        _cl.EnqueueWriteBuffer(_commandQueue, buffer_id, true, 0, (uint)(size * sizeof(T)), ptr, 0, null, null).StateCheck();
     }
 
     /// <summary>
@@ -116,7 +117,7 @@ public unsafe class Device : IDisposable
     /// <param name="ptr">数据地址</param>
     public void ReadBuffer<T>(nint buffer_id, uint size, void* ptr) where T : unmanaged
     {
-        _cl.EnqueueReadBuffer(_commandQueue, buffer_id, true, 0, (uint)(size * sizeof(T)), ptr, 0, null, null);
+        _cl.EnqueueReadBuffer(_commandQueue, buffer_id, true, 0, (uint)(size * sizeof(T)), ptr, 0, null, null).StateCheck();
     }
 
     public void Dispose()

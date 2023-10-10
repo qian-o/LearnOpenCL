@@ -21,4 +21,12 @@ public unsafe static class OpenCLExtensions
 
         return result;
     }
+
+    public static void StateCheck(this int errorCode)
+    {
+        if ((ErrorCodes)errorCode != ErrorCodes.Success)
+        {
+            throw new Exception(errorCode.ToString());
+        }
+    }
 }

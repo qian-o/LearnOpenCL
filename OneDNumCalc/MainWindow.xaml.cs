@@ -1,7 +1,6 @@
 ﻿using Core;
 using Core.Helpers;
 using Silk.NET.OpenCL;
-using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 
@@ -12,15 +11,13 @@ namespace OneDNumCalc;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private readonly CL cl = CL.GetApi();
+    private readonly CL _cl = CL.GetApi();
+    private readonly Program _program;
 
     public MainWindow()
     {
         InitializeComponent();
-    }
 
-    private unsafe void Window_Loaded(object sender, RoutedEventArgs e)
-    {
         string source = @"
             kernel void add(global const int* a, global const int* b, global int* c)
             {
@@ -34,18 +31,22 @@ public partial class MainWindow : Window
                 c[i] = a[i] * b[i];
             }";
 
-        Platform platform = cl.GetPlatforms().First();
+        Platform platform = _cl.GetPlatforms().First();
 
-        using Device device = platform.GetDevices(DeviceType.Gpu).First();
-        using Program program = device.CreateProgram(source);
+        Device device = platform.GetDevices(DeviceType.Gpu).First();
 
-        TestAdd(program);
-        TestMul(program);
+        _program = device.CreateProgram(source);
+    }
+
+    private void Button_Click(object sender, RoutedEventArgs e)
+    {
+        TestAdd(_program);
+        TestMul(_program);
     }
 
     private unsafe void TestAdd(Program program)
     {
-        using Kernel kernel = program.GetKernel("add");
+        Kernel kernel = program.GetKernel("add");
 
         nint memA = program.Device.CreateBuffer<int>(1024, MemFlags.ReadOnly);
         nint memB = program.Device.CreateBuffer<int>(1024, MemFlags.ReadOnly);
@@ -70,11 +71,6 @@ public partial class MainWindow : Window
         kernel.Run(1, 1024);
 
         program.Device.ReadBuffer<int>(memC, 1024, c);
-
-        for (int i = 0; i < 1024; i++)
-        {
-            Debug.WriteLine($"{a[i]} + {b[i]} = {c[i]}");
-        }
 
         program.Device.DeleteBuffer(memA);
         program.Device.DeleteBuffer(memB);
@@ -83,7 +79,7 @@ public partial class MainWindow : Window
 
     private unsafe void TestMul(Program program)
     {
-        using Kernel kernel = program.GetKernel("mul");
+        Kernel kernel = program.GetKernel("mul");
 
         nint memA = program.Device.CreateBuffer<int>(1024, MemFlags.ReadOnly);
         nint memB = program.Device.CreateBuffer<int>(1024, MemFlags.ReadOnly);
@@ -108,11 +104,6 @@ public partial class MainWindow : Window
         kernel.Run(1, 1024);
 
         program.Device.ReadBuffer<int>(memC, 1024, c);
-
-        for (int i = 0; i < 1024; i++)
-        {
-            Debug.WriteLine($"{a[i]} * {b[i]} = {c[i]}");
-        }
 
         program.Device.DeleteBuffer(memA);
         program.Device.DeleteBuffer(memB);

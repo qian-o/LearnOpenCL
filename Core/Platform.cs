@@ -1,4 +1,5 @@
-﻿using Silk.NET.OpenCL;
+﻿using Core.Helpers;
+using Silk.NET.OpenCL;
 
 namespace Core;
 
@@ -38,12 +39,12 @@ public unsafe class Platform
     public Device[] GetDevices(DeviceType deviceType = DeviceType.Gpu)
     {
         uint* num_devices = stackalloc uint[1];
-        _cl.GetDeviceIDs(_id, deviceType, 0, null, num_devices);
+        _cl.GetDeviceIDs(_id, deviceType, 0, null, num_devices).StateCheck();
 
         Device[] devices = new Device[*num_devices];
 
         nint* device_ids = stackalloc nint[(int)*num_devices];
-        _cl.GetDeviceIDs(_id, deviceType, *num_devices, device_ids, null);
+        _cl.GetDeviceIDs(_id, deviceType, *num_devices, device_ids, null).StateCheck();
 
         for (int i = 0; i < devices.Length; i++)
         {
