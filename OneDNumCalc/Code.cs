@@ -1,22 +1,39 @@
 ﻿using Core;
 using Core.Helpers;
 using Silk.NET.OpenCL;
-using System.Linq;
-using System.Windows;
 
 namespace OneDNumCalc;
 
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
-public partial class MainWindow : Window
+class Code
 {
-    private readonly CL _cl = CL.GetApi();
-    private readonly Program _program;
-
-    public MainWindow()
+    static void Main(string[] args)
     {
-        InitializeComponent();
+        _ = args;
+
+        CL cl = CL.GetApi();
+
+        Dictionary<Platform, Device[]> platforms = new();
+        foreach (Platform item in cl.GetPlatforms())
+        {
+            platforms.Add(item, item.GetDevices(DeviceType.All));
+        }
+
+        // Print Platforms;
+        {
+            Console.WriteLine("Supported Platforms:");
+            foreach (Platform platform in platforms.Keys)
+            {
+                Console.WriteLine($"  {platform.Name} - {platform.Version}");
+
+                Console.WriteLine("    Devices:");
+                foreach (Device device in platforms[platform])
+                {
+                    Console.WriteLine($"        {device.Name} - {device.Version} - {device.Type}");
+                }
+
+                Console.WriteLine();
+            }
+        }
 
         string source = @"
             kernel void add(global const int* a, global const int* b, global int* c)
@@ -31,20 +48,13 @@ public partial class MainWindow : Window
                 c[i] = a[i] * b[i];
             }";
 
-        Platform platform = _cl.GetPlatforms().First();
+        Program program = platforms.First().Value.First(item => item.Type == DeviceType.Gpu).CreateProgram(source);
 
-        Device device = platform.GetDevices(DeviceType.Gpu).First();
-
-        _program = device.CreateProgram(source);
+        TestAdd(program);
+        TestMul(program);
     }
 
-    private void Button_Click(object sender, RoutedEventArgs e)
-    {
-        TestAdd(_program);
-        TestMul(_program);
-    }
-
-    private unsafe void TestAdd(Program program)
+    private static unsafe void TestAdd(Program program)
     {
         Kernel kernel = program.GetKernel("add");
 
@@ -77,7 +87,7 @@ public partial class MainWindow : Window
         program.Device.DeleteBuffer(memC);
     }
 
-    private unsafe void TestMul(Program program)
+    private static unsafe void TestMul(Program program)
     {
         Kernel kernel = program.GetKernel("mul");
 

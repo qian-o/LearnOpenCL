@@ -9,6 +9,7 @@ public unsafe class Device : IDisposable
     private readonly nint _id;
     private readonly string _version;
     private readonly string _name;
+    private readonly DeviceType _type;
     private readonly nint _context;
     private readonly nint _commandQueue;
     private readonly List<nint> _buffers;
@@ -20,6 +21,8 @@ public unsafe class Device : IDisposable
     public string Version => _version;
 
     public string Name => _name;
+
+    public DeviceType Type => _type;
 
     public nint Context => _context;
 
@@ -33,12 +36,15 @@ public unsafe class Device : IDisposable
 
         byte* version = stackalloc byte[1024];
         byte* name = stackalloc byte[1024];
+        byte* type = stackalloc byte[8];
 
         cl.GetDeviceInfo(id, DeviceInfo.Version, 1024, version, null);
         cl.GetDeviceInfo(id, DeviceInfo.Name, 1024, name, null);
+        cl.GetDeviceInfo(id, DeviceInfo.Type, 8, type, null);
 
         _version = new string((sbyte*)version);
         _name = new string((sbyte*)name);
+        _type = (DeviceType)(*(ulong*)type);
         _context = cl.CreateContext(null, 1, id, null, null, null);
         _commandQueue = cl.CreateCommandQueue(_context, id, CommandQueueProperties.None, null);
         _buffers = new List<nint>();
