@@ -2,6 +2,7 @@
 using Core.Helpers;
 using Silk.NET.Maths;
 using Silk.NET.OpenCL;
+using System.Diagnostics;
 
 namespace MathCalc;
 
@@ -9,6 +10,8 @@ internal class Code
 {
     static void Main(string[] args)
     {
+        Stopwatch stopwatch = Stopwatch.StartNew();
+
         _ = args;
 
         CL cl = CL.GetApi();
@@ -17,8 +20,21 @@ internal class Code
 
         Program program = platforms.First().Value.First(item => item.Type == DeviceType.Gpu).CreateProgram(File.ReadAllText("matrix_calculate.cl"));
 
-        Vector4D<float>[] a = Multiply(program, 10);
-        Vector4D<float>[] b = Multiply(10);
+        stopwatch.Restart();
+
+        Multiply(100000);
+
+        stopwatch.Stop();
+
+        Console.WriteLine($"CPU Parallel execution time: {stopwatch.ElapsedMilliseconds} milliseconds");
+
+        stopwatch.Restart();
+
+        Multiply(program, 100000);
+
+        stopwatch.Stop();
+
+        Console.WriteLine($"GPU Parallel execution time: {stopwatch.ElapsedMilliseconds} milliseconds");
     }
 
     private static unsafe Vector4D<float>[] Multiply(Program program, uint length)
@@ -73,13 +89,13 @@ internal class Code
         Matrix4X4<float>[] b = new Matrix4X4<float>[length];
         Vector4D<float>[] c = new Vector4D<float>[length];
 
-        for (int i = 0; i < length; i++)
+        Parallel.For(0, length, (i) =>
         {
             a[i] = new Vector4D<float>(i, i, i, i);
             b[i] = Matrix4X4.CreateRotationX<float>(i);
 
             c[i] = Vector4D.Transform(a[i], b[i]);
-        }
+        });
 
         return c;
     }
