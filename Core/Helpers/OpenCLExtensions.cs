@@ -22,6 +22,35 @@ public unsafe static class OpenCLExtensions
         return result;
     }
 
+    public static Dictionary<Platform, Device[]> GetPlatformsAndDevices(this CL cl, bool print = true)
+    {
+        Dictionary<Platform, Device[]> platforms = new();
+
+        foreach (Platform item in cl.GetPlatforms())
+        {
+            platforms.Add(item, item.GetDevices(DeviceType.All));
+        }
+
+        if (print)
+        {
+            Console.WriteLine("Supported Platforms:");
+            foreach (Platform platform in platforms.Keys)
+            {
+                Console.WriteLine($"  {platform.Name} - {platform.Version}");
+
+                Console.WriteLine("    Devices:");
+                foreach (Device device in platforms[platform])
+                {
+                    Console.WriteLine($"        {device.Name} - {device.Version} - {device.Type}");
+                }
+
+                Console.WriteLine();
+            }
+        }
+
+        return platforms;
+    }
+
     public static void StateCheck(this int errorCode)
     {
         if ((ErrorCodes)errorCode != ErrorCodes.Success)

@@ -9,6 +9,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{81
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OneDNumCalc", "OneDNumCalc\OneDNumCalc.csproj", "{7DF87ABC-319A-4E80-8D89-2A3A6F9EDBB5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MathCalc", "MathCalc\MathCalc.csproj", "{B1440F43-F492-440A-B259-A6D3E4515DF8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,12 +25,17 @@ Global
 		{7DF87ABC-319A-4E80-8D89-2A3A6F9EDBB5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DF87ABC-319A-4E80-8D89-2A3A6F9EDBB5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DF87ABC-319A-4E80-8D89-2A3A6F9EDBB5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1440F43-F492-440A-B259-A6D3E4515DF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1440F43-F492-440A-B259-A6D3E4515DF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1440F43-F492-440A-B259-A6D3E4515DF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1440F43-F492-440A-B259-A6D3E4515DF8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7DF87ABC-319A-4E80-8D89-2A3A6F9EDBB5} = {8168F164-FD53-4BCA-9B4B-79358A5C7552}
+		{B1440F43-F492-440A-B259-A6D3E4515DF8} = {8168F164-FD53-4BCA-9B4B-79358A5C7552}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2CF66248-4508-4C66-B638-A1CC15A10D71}

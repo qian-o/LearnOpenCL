@@ -13,29 +13,8 @@ class Code
 
         CL cl = CL.GetApi();
 
-        Dictionary<Platform, Device[]> platforms = new();
-        foreach (Platform item in cl.GetPlatforms())
-        {
-            platforms.Add(item, item.GetDevices(DeviceType.All));
-        }
-
-        // Print Platforms;
-        {
-            Console.WriteLine("Supported Platforms:");
-            foreach (Platform platform in platforms.Keys)
-            {
-                Console.WriteLine($"  {platform.Name} - {platform.Version}");
-
-                Console.WriteLine("    Devices:");
-                foreach (Device device in platforms[platform])
-                {
-                    Console.WriteLine($"        {device.Name} - {device.Version} - {device.Type}");
-                }
-
-                Console.WriteLine();
-            }
-        }
-
+        Dictionary<Platform, Device[]> platforms = cl.GetPlatformsAndDevices();
+        
         string source = @"
             kernel void calculateGCD(global const int* a, global const int* b, global int* c)
             {
