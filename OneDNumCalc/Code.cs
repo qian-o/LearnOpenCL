@@ -14,7 +14,7 @@ class Code
         CL cl = CL.GetApi();
 
         Dictionary<Platform, Device[]> platforms = cl.GetPlatformsAndDevices();
-        
+
         string source = @"
             kernel void calculateGCD(global const int* a, global const int* b, global int* c)
             {

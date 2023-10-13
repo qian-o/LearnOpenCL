@@ -22,19 +22,19 @@ internal class Code
 
         stopwatch.Restart();
 
-        Multiply(100000);
-
-        stopwatch.Stop();
-
-        Console.WriteLine($"CPU Parallel execution time: {stopwatch.ElapsedMilliseconds} milliseconds");
-
-        stopwatch.Restart();
-
         Multiply(program, 100000);
 
         stopwatch.Stop();
 
         Console.WriteLine($"GPU Parallel execution time: {stopwatch.ElapsedMilliseconds} milliseconds");
+
+        stopwatch.Restart();
+
+        Multiply(100000);
+
+        stopwatch.Stop();
+
+        Console.WriteLine($"CPU Parallel execution time: {stopwatch.ElapsedMilliseconds} milliseconds");
     }
 
     private static unsafe Vector4D<float>[] Multiply(Program program, uint length)

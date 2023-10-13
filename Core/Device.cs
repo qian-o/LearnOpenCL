@@ -70,7 +70,7 @@ public unsafe class Device : IDisposable
     /// <returns></returns>
     public Program CreateProgram(string source, string[]? options = null)
     {
-        options ??= new string[] { "-cl-opt-disable" };
+        options ??= new string[] { "-cl-mad-enable" };
 
         nint program_id = _cl.CreateProgramWithSource(_context, 1, new[] { source }, null, null);
 
